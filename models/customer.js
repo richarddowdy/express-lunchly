@@ -82,10 +82,7 @@ class Customer {
   /** returns first and last name of customer */
 
   fullName(){
-
-    console.log(this)
     const fullName = `${this.firstName} ${this.lastName}`;
-    console.log(fullName)
     return fullName;
   }
 }
