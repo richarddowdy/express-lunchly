@@ -113,4 +113,17 @@ router.post("/:id/add-reservation/", async function (req, res, next) {
   }
 });
 
+/** Handles search for customer. */
+router.post("/search", async function (req, res, next) {
+  try {
+    const searchTerm = req.body.search;
+    const customerId = await Customer.search(searchTerm);
+  
+    return res.redirect(`/${customerId}/`);
+  }
+  catch (err) {
+    return next(err);
+  }
+});
+
 module.exports = router;

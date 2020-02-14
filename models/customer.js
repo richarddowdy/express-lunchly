@@ -81,10 +81,27 @@ class Customer {
 
   /** returns first and last name of customer */
 
-  fullName(){
+  fullName() {
     const fullName = `${this.firstName} ${this.lastName}`;
     return fullName;
   }
+
+  /** finds the customer using last name */
+  static async search(searchTerm) {
+    // make it match DB with Title case
+    let letters = searchTerm.split('');
+    letters[0] = letters[0].toUpperCase();
+    let newTerm = letters.join('');
+
+    const result = await db.query(
+      `SELECT id FROM customers
+      WHERE last_name=$1`,
+      [newTerm]
+    );
+
+    return result.rows[0].id;
+  }
+
 }
 
 module.exports = Customer;
