@@ -47,6 +47,32 @@ router.post("/add/", async function (req, res, next) {
   }
 });
 
+/** Handles search for customer. */
+
+router.get("/search", async function (req, res, next) {
+  try {
+    const searchTerm = req.query;
+    const customerId = await Customer.search(searchTerm);
+  
+    return res.redirect(`/${customerId}/`);
+  }
+  catch (err) {
+    return next(err);
+  }
+});
+
+/** Gets a list of the top 10 customers who make most reservations */
+
+router.get("/best-customers", async function(req, res, next){
+  try{
+    const topT = await Customer.topTen();
+    return res.render("best-customer.html", {topT})
+  }
+  catch (err){
+    return next(err);
+  }
+})
+
 /** Show a customer, given their ID. */
 
 router.get("/:id/", async function (req, res, next) {
@@ -113,17 +139,6 @@ router.post("/:id/add-reservation/", async function (req, res, next) {
   }
 });
 
-/** Handles search for customer. */
-router.post("/search", async function (req, res, next) {
-  try {
-    const searchTerm = req.body.search;
-    const customerId = await Customer.search(searchTerm);
-  
-    return res.redirect(`/${customerId}/`);
-  }
-  catch (err) {
-    return next(err);
-  }
-});
+
 
 module.exports = router;

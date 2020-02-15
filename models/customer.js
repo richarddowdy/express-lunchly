@@ -3,6 +3,7 @@
 const db = require("../db");
 const Reservation = require("./reservation");
 
+
 /** Customer of the restaurant. */
 
 class Customer {
@@ -86,22 +87,48 @@ class Customer {
     return fullName;
   }
 
-  /** finds the customer using last name */
+  /** finds the customer using first and last name */
+
   static async search(searchTerm) {
-    // make it match DB with Title case
-    let letters = searchTerm.split('');
-    letters[0] = letters[0].toUpperCase();
-    let newTerm = letters.join('');
+
+    // Uppercases first letter of first name and last name
+    let words = searchTerm.search.split(" ");
+
+    let firstNameLetters = words[0].split("");
+    firstNameLetters[0] = firstNameLetters[0].toUpperCase();
+    let firstName = firstNameLetters.join("");
+    
+    let lastNameLetters = words[1].split("");
+    lastNameLetters[0] = lastNameLetters[0].toUpperCase();
+    let lastName = lastNameLetters.join("");
+
 
     const result = await db.query(
       `SELECT id FROM customers
-      WHERE last_name=$1`,
-      [newTerm]
+      WHERE first_name = $1 AND last_name=$2 `,
+      [firstName, lastName]
     );
 
     return result.rows[0].id;
   }
 
+  // finds top ten customers who make the most reservations
+  // returns top then customers as instances
+
+  static async topTen(){
+
+    const result = await db.query(
+      `SELECT c.id, c.first_name AS "firstName", c.last_name AS "lastName", c.phone, c.notes, r.customer_id, COUNT(*)
+       FROM reservations r
+       JOIN customers c
+       ON c.id = r.customer_id
+       GROUP BY c.first_name, c.last_name, c.id, r.customer_id
+       ORDER BY COUNT DESC
+       LIMIT 10`
+    )
+
+    return result.rows.map(c => new Customer(c));
+  }
 }
 
 module.exports = Customer;
